@@ -16,9 +16,8 @@ theta = sqrt(((log(R)^2) - ((zeta^2)*(log(R)^2)))/(zeta^2));
 % Polos desejados:
 a = R*cos(theta);
 b = R*sin(theta);
-%pd1 = complex(a, b);
-%pd2 = complex(a, -b);
-%pd3 = complex(0, 0);
+pd1 = complex(a, b);
+pd2 = complex(a, -b);
 
 % Polinômio característico:
 %polmf = conv([1 -pd1], [1 -pd2]);
@@ -61,38 +60,101 @@ M = inv(E)*D;
 alpha = fliplr(M(1:n)');
 beta = fliplr(M(n+1:2*n)');
 
-%Equação a diferenças do controlador:
-
-
 % Função de transferência do controlador:
 C = tf(beta, alpha, T);
 
 % Malha fechada:
 MF = feedback(C*Gz, 1);
-refy = feedback(C*Gz/dcgain(MF), dcgain(MF));
-figure
-hold on
-%step(MF)
-step(refy)
-hold off
-
+refy = feedback(C*Gz, 1)/dcgain(MF);
 %Sinal de controle:
-refu = feedback(C/dcgain(MF), Gz*dcgain(MF));
+refu = feedback(C, Gz)/dcgain(MF);
+
+%Plot:
 figure
-step(refu)
+subplot(2,1,1);
+[y,t] = step(refy);
+plot(t, y, 'b', 'LineWidth', 1.5);
+grid
+xlabel('Tempo [s]');
+ylabel('Saída do Sistema');
+xlim([0,20]);
+subplot(2,1,2);
+[u,t] = step(refu);
+plot(t, u, 'r', 'LineWidth', 1.5);
+grid
+xlabel('Tempo [s]');
+ylabel('Sinal de Controle');
+xlim([0,20]);
+exportgraphics(gcf, 'mf.eps', 'ContentType', 'vector');
 
 %Bode controlador:
+[mag, phase, omega] = bode(C);
+mag_dB = 20*log10(squeeze(mag));
+phase = squeeze(phase);
+omega = squeeze(omega);
 figure
-bode(C)
+subplot(2,1,1);
+semilogx(omega, mag_dB, 'b', 'LineWidth', 1.5);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Magnitude (dB)');
+subplot(2,1,2);
+semilogx(omega, phase, 'b', 'LineWidth', 1);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Fase (°)');
+exportgraphics(gcf, 'bode_cont.eps', 'ContentType', 'vector');
 
 %Bode sistema:
+[mag, phase, omega] = bode(Gz);
+mag_dB = 20*log10(squeeze(mag));
+phase = squeeze(phase);
+omega = squeeze(omega);
 figure
-bode(Gz)
+subplot(2,1,1);
+semilogx(omega, mag_dB, 'b', 'LineWidth', 1.5);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Magnitude (dB)');
+subplot(2,1,2);
+semilogx(omega, phase, 'b', 'LineWidth', 1);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Fase (°)');
+exportgraphics(gcf, 'bode_sys.eps', 'ContentType', 'vector');
 
 %Bode ref -> y:
+[mag, phase, omega] = bode(refy);
+mag_dB = 20*log10(squeeze(mag));
+phase = squeeze(phase);
+omega = squeeze(omega);
 figure
-bode(refy)
+subplot(2,1,1);
+semilogx(omega, mag_dB, 'b', 'LineWidth', 1.5);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Magnitude (dB)');
+subplot(2,1,2);
+semilogx(omega, phase, 'b', 'LineWidth', 1);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Fase (°)');
+exportgraphics(gcf, 'bode_mf.eps', 'ContentType', 'vector');
 
 %Bode ref -> u:
+[mag, phase, omega] = bode(refu);
+mag_dB = 20*log10(squeeze(mag));
+phase = squeeze(phase);
+omega = squeeze(omega);
 figure
-bode(refu)
+subplot(2,1,1);
+semilogx(omega, mag_dB, 'b', 'LineWidth', 1.5);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Magnitude (dB)');
+subplot(2,1,2);
+semilogx(omega, phase, 'b', 'LineWidth', 1);
+grid
+xlabel('Frequência (rad/s)');
+ylabel('Fase (°)');
+exportgraphics(gcf, 'bode_refu.eps', 'ContentType', 'vector');
