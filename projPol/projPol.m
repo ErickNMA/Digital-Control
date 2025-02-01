@@ -87,6 +87,9 @@ ylabel('Sinal de Controle');
 xlim([0,20]);
 exportgraphics(gcf, 'mf.eps', 'ContentType', 'vector');
 
+%Stepinfo:
+stepinfo(refy)
+
 %Bode controlador:
 [mag, phase, omega] = bode(C);
 mag_dB = 20*log10(squeeze(mag));
