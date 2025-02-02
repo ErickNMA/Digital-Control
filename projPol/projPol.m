@@ -1,5 +1,16 @@
 % Sistema:
 G = tf(1, conv([1 2], [1 0.2 1]));
+%Plot:
+figure
+[y,t] = step(G);
+plot(t, y, 'b', 'LineWidth', 1.5);
+grid
+xlabel('Tempo [s]');
+ylabel('Saída do Sistema');
+xlim([0,50]);
+exportgraphics(gcf, 'ma.eps', 'ContentType', 'vector');
+
+%Discretização:
 T = 1;
 Gz = c2d(G, T, 'zoh');
 
